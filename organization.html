@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css\common.css">
+<link rel="stylesheet" href="css\jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="css\themes\information.min.css" />
+<link rel="stylesheet" href="css\themes\jquery.mobile.icons.min.css" />
+<script type="text/javascript" src="js\jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="js\jquery.mobile-1.4.5.min.js"></script>
+<script>
+
+</script>
+</head>
+<body>
+<div data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Organizations</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="ui-content">
+	<form>
+		<input id="filterBasic-input" data-type="search">
+	</form><br>
+	<ul data-role="listview" data-filter="true" data-input="#filterBasic-input">
+		<li><a href="#objectives" data-ajax="false">Objectives</a></li>
+		<li><a href="#definition" data-ajax="false">Definition</a></li>
+		<li><a href="#framework" data-ajax="false">Personal Data Privacy Framework</a></li>
+		<li><a href="#pri_require" data-ajax="false">Privacy Requirements</a></li>
+	</ul>
+	</div>
+</div>
+
+<div id="pri_require" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Requirements</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="ui-content">
+		
+	</div>
+</div>
+
+<div id="definition" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Definition</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="ui-content">
+		<img src="pic/PP_Org03.png">
+		<h4>Data relates directly or indirectly to a living person</h4>
+		<h4>Can find out the person's identity from the data directly or indirectly</h4>
+		<h4>Data is in recorded from that you can access</h4>
+	</div>
+</div>
+
+<div id="objectives" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Objectives</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="ui-content">
+		<img src="pic/PP_Org01.png">
+		<h3>Organizations must comply to the Personal Data (Privacy) Ordinance</h3>
+		<h4>Ordinance introduced in 1996</h4>
+		<h4>New amendments in 2012</h4>
+		<h4>Violation of Ordinance may result in investigation by the Privacy Commissioner</h4>
+		<p>may face disciplinary action</p>
+		<p>may be imprisoned for up to 5 years</p>
+		<img src="pic/PP_Org02.png">
+		<p>Significant HR and monetary waste during the lengthy investigation leading up to the litigation</p>
+		<p>may be fined up to a maximum of HK$1 million</p>
+		<p>Significant reputation damage and media attention</p>
+	</div>
+</div>
+
+<div id="framework" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Framework</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="ui-content">
+		<img src="pic/PP_Org04.png">
+		<img src="pic/PP_Org05.png">
+		<img src="pic/PP_Org06.png">
+		<img src="pic/PP_Org07.png">
+		<img src="pic/PP_Org08.png">
+	</div>
+</div>
+
+</body>
+</html>

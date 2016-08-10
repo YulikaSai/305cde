@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css\jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="css\themes\information.min.css" />
+<link rel="stylesheet" href="css\themes\jquery.mobile.icons.min.css" />
+<style>
+textarea			{ 
+	width: 100%; 
+	border-radius:5px; 
+	webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+}
+</style>
+<script type="text/javascript" src="js\jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="js\jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="js\myApp.js"></script>
+<script>
+$(document).on("pageinit",function() {
+	$("#btnDelete").click(function(e) {
+		console.log("delete record:"+$(e.target).attr("rec"));
+		var _data = { "id" : $(e.target).attr("rec") };
+		$.ajax({
+			url: urlHost + "php/delPost.php",
+			data: _data,
+			type: "DELETE",
+			dataType: "json",
+			success: function(result, status) {
+				console.log("delete result:"+JSON.stringify(result)+"\ncheck:"+(result=="success"));
+				if(result=="success") {
+				//alert("here");
+					$.mobile.changePage("#",{ ajax : false });
+					loadForum();
+				} else {
+					// handle delete fail
+				}
+			}
+		});		
+	});
+	
+	$("#btnNew").click(function(e) {
+		console.log("new button");
+		var _newText = $("#taComment").val();
+		if(_newText == "") { return; }
+		var _data = { "newComment" : _newText, "loginid" : "1" };
+		$.ajax({
+			url: urlHost + "php/newPost.php",
+			type: "POST",
+			data: _data,
+			dataType: "json",
+			success: function(result, status) {
+				console.log(JSON.stringify(result));
+				if(result == "success") {
+					$("#taComment").val("");
+					loadForum();
+				}
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				console.log("error:"+thrownError);
+			}
+		});
+	});
+})
+
+
+$(document).on("pagebeforeshow",function() {
+	loadForum();
+});
+
+$(document).on("pagebeforeshow","#diagRemove",function(e, pageData) {
+	//alert($.mobile.path.parseLocation().search);
+	//console.log($(this).data("url"));
+	//console.log($(e.target).data("url"));
+	//console.log(location.href);
+});
+
+
+function loadForum() {
+	$.ajax({
+		url: urlHost + "php/getPost.php",
+		type: "GET",
+		data: null,
+		dataType: "json",
+		success: function(returnData, status) {
+			console.log("returnData:"+JSON.stringify(returnData));
+			if(status=="success") {
+				var _loginUser = localStorage.getItem("loginUser");
+				var _html = "";
+				$("#postList").children('ul').html("");
+				$.each(returnData, function (index, value) {
+					$('#postList').children('ul').append('<li data-icon="minus"><a href="#"><h1 id="tx_'+value.id+'">'+value.comment+'</h1><div class="ui-grid-a"><div class="ui-block-a"><button rec="'+value.id+'">Edit</button></div><div class="ui-block-b" style="text-align:right;"><p>'+value.login+' | '+value.createTime+'</p></div></div></a><a rec="'+value.id+'" href="#">delete</a></li>');//.listview('refresh');
+				});
+				//$("#postList").children("ul").listview("refresh");
+				
+				$("#postList").children("ul").promise().done(function () {
+					$(this).listview("refresh");
+					//$(this).find("button:last-child").hide();
+					$(this).find("button").click(function(e) {
+						console.log("edit:"+$(e.target).attr("rec")+"::html:"+$(e.target).html());
+						console.log("val:"+$(e.target).parent().parent().parent().children("h1").html());
+						var _recID = $(e.target).attr("rec");
+						if($(e.target).html()=="Edit") {
+							$(e.target).html("Update");
+							$("#tx_"+_recID).html("<textarea id='ta_"+_recID+"'>"+$("#tx_"+_recID).html()+"</textarea>");
+						} else {
+							var _taID = "#ta_"+_recID
+							var _postText = $(_taID).val();
+							//  ignore if post is blank;
+							if(_postText=="") { return; }
+							var _data = { "recID" : _recID, "newComment" : _postText };
+							console.log("comment:"+_postText+"::data:"+JSON.stringify(_data));	
+							$.ajax({
+								url: urlHost+"php/updatePost.php",
+								type: "PUT",
+								data: _data,
+								dataType: "json",
+								success: function(result, status) {
+									console.log("result:"+JSON.stringify(result));
+									if(result == "success") {
+										console.log("reload");
+										//$.mobile.loadPage("#");
+										loadForum();
+									}
+								},
+								error: function(xhr, ajaxOptions, thrownError) {
+									console.log("error:"+thrownError);
+								}
+							});
+						}
+					});					
+					// add event handler for deletion
+					$(this).children("li").children("a:last-child").click(function(e) {
+						console.log("delete li"+$(e.target).attr("rec"));
+						//alert($(e.target).prop("tagName"));
+						if($(e.target).prop("tagName")!="A" || !$(e.target).attr("rec")) { return; }
+						console.log("comment:"+$(e.target).parent().children("a").children("h1").html());
+						var _showPage = "#diagRemove?id="+$(e.target).attr("rec");
+						var _postText = $(e.target).parent().children("a").children("h1").html();
+						if(_postText.indexOf("textarea")!=-1) {
+							console.log("found textarea");
+							_postText = $(e.target).parent().children("a").children("h1").children("textarea").val();
+						}
+						console.log("showPage:"+_showPage+"::postText:"+_postText);
+						$("#diagRemove div p").html("delete post?<br><br>"+_postText);
+						$("#btnDelete").attr("rec",$(e.target).attr("rec"));
+						$.mobile.changePage(_showPage, { ajax : false });
+					});
+
+				});
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert("xhr:"+JSON.stringify(xhr)+"\nthrownError"+thrownError);
+		}
+	});
+}
+
+</script>
+</head>
+<body>
+<div data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Discuss</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext">back</a>
+	</div>
+	<div data-role="content" class="ui-content">
+		<fieldset>
+			<h1>Comment</h1>
+			<textarea name="taComment" id="taComment"></textarea>
+			<button id="btnNew" data-role="button" class="ui-btn-b">Add Comment</button>
+		</fieldset>
+		<div id="postList">
+			<ul data-role="listview" data-inset="true"></ul>
+		</div>
+	</div>
+</div>
+
+<div data-role="dialog" id="diagRemove" data-dialog="true">
+  <div data-role="main" class="ui-content">
+  <h3>Remove Record</h3>
+    <p></p>
+    <a href="#" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-inline ui-mini" data-rel="back">Cancel</a>
+	 <a id="btnDelete" href="#" class="ui-btn ui-btn-inline ui-btn-b ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-left ui-btn-inline ui-mini" data-rel="back">Confirm</a>
+  </div>
+</div>
+
+<div data-role="dialog" id="diagUpdate" data-dialog="true">
+  <div data-role="main" class="ui-content">
+  <h3>Record Updated</h3>
+  <a href="#" data-rel="back" class="ui-btn">OK</a>
+  </div>
+</div>
+
+<div data-role="page" id="editPage">
+	<div data-role="header" data-position="fixed">
+		<h1>Edit Post</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext">Back</a>
+	</div>
+	<div data-role="content">
+		<textarea id="taPost" placeholder="edit post text"></textarea>
+		<button onclick="updatePost();">Update</button>
+	</div>
+</div>
+
+</body>
+</html>

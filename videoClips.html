@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css\jquery.mobile-1.4.5.min.css">
+<script type="text/javascript" src="js\jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="js\jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="js\cordova.js"></script>
+<script type="text/javascript" src="js\index.js"></script>
+<style>
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px; height: 0; overflow: hidden;
+}
+ 
+.video-container iframe,
+.video-container object,
+.video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+</style>
+<script>
+
+</script>
+</head>
+<body>
+<div data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Video Clips</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext"data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="content">
+		<ul data-role="listview" data-filter="true" data-input="#filterBasic-input">
+		<li><a href="#v1" data-ajax="false"><div style="white-space:normal;">Stay Smart</div></a></li>
+		<li><a href="#v2" data-ajax="false"><div style="white-space:normal;">Mind Your Digital Footprint</div></a></li>
+		<li><a href="#v3" data-ajax="false"><div style="white-space:normal;">Children Online Privacy</div></a></li>
+		</ul>
+	
+<!--	<div class="ui-solo video-container">
+		<iframe src="http://www.youtube.com/embed/Jw4JwAnMRb4" width="100%" height="480px" frameborder="0" allowfullscreen></iframe>
+	</div>		
+	<div class="ui-solo video-container">
+		<iframe src="http://www.youtube.com/embed/Ckgq6FschDs" width="100%" height="480px" frameborder="0" allowfullscreen></iframe>
+	</div>	-->
+	</div>
+</div>
+
+<div id="v1" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Video Clips</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext"data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="content">
+	<h2>Stay Smart</h2>
+	<div class="ui-solo video-container">
+		<iframe src="http://www.youtube.com/embed/_eOLJ9UgVpQ" width="100%" height="480px" frameborder="0" allowfullscreen></iframe>
+	</div>
+	</div>
+</div>
+
+<div id="v2" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Video Clips</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext"data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="content">
+	<h2>Mind Your Digital Footprint</h2>
+	<div class="ui-solo video-container">
+		<iframe src="http://www.youtube.com/embed/Jw4JwAnMRb4" width="100%" height="480px" frameborder="0" allowfullscreen></iframe>
+	</div>
+	</div>
+</div>
+
+<div id="v3" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Video Clips</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l" data-iconpos="notext"data-ajax="false">back</a>
+	</div>
+	<div data-role="content" class="content">
+	<h2>Children Online Privacy</h2>
+	<div class="ui-solo video-container">
+		<iframe src="http://www.youtube.com/embed/Ckgq6FschDs" width="100%" height="480px" frameborder="0" allowfullscreen></iframe>
+	</div>
+	</div>
+</div>
+
+
+</body>
+</html>

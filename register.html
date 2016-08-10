@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css\jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="css\themes\information.min.css" />
+<link rel="stylesheet" href="css\themes\jquery.mobile.icons.min.css" />
+<style>
+.error {
+    color:red;
+}
+</style>
+<script type="text/javascript" src="js\jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="js\jquery.validate.min.js"></script>
+<script type="text/javascript" src="js\jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="js\myApp.js"></script>
+<script>	
+var _submitForm = null;
+
+$(document).on("pageinit", function() {
+	$("#regForm").validate({
+		rules: {
+			uname: {
+				required: true, 
+				minlength: 3
+		},
+			upwd: {
+				required: true,
+				minlength: 6
+			},
+			vpwd: {
+				required: true, 
+				equalTo: "#tbxPwd"
+			}, 
+			uemail: {
+				required: true, 
+				email: true
+			}
+		},
+		messages: {
+		uname: {
+				required: "Please enter your name.",
+				minlength: "Username require at least 3 characters."
+			},
+			upwd: {
+				required: "Please enter your password.", 
+				minlength: "Password require at least 6 characters."
+			},
+			vpwd: {
+				required: "Please enter your password again.",
+				equalTo: "Incorrect re-type password."
+			}, 
+			uemail: {
+				required: "Please enter your email",
+				email: "Incorrect email"
+			}
+		},
+		errorPlacement: function (error, element) {
+			///error.appendTo(element.parent().prev());
+			error.insertAfter(element.parent().last());
+		},
+		submitHandler: function (form) {
+			/*$(":mobile-pagecontainer").pagecontainer('change', '#success', {
+			reload: false
+			})*/
+			//alert("submitHandler");
+			registerUser();
+			return false;
+		}
+	});
+	
+	$(':input[name="uemail"]').rules("add", {
+		"remote" : {
+			url: urlHost + "php/validateEmail.php",
+			type: "get",
+			dataType: "json",
+			data: {
+				dupemail: function() {
+					return $('#regForm :input[name="uemail"]').val();
+				}
+			}
+		}, 
+			messages: {
+				remote: "email already registered."
+		}
+	});
+	
+	
+	$(':input[name="uname"]').rules("add", {
+		"remote" : {
+			url: urlHost + 'php/duplicateUser.php',
+			type: "get",
+			dataType: "json",
+			data: {
+				dupuser: function() {
+					return $('#regForm :input[name="uname"]').val();
+				}
+			}
+		}, 
+			messages: {
+				remote: "username already registered."
+		}
+	});
+	
+	$("#regForm").on("submit",function() {
+		//alert("form submit");
+	});
+	
+	$("#closeDialog").click(function () {
+		if(_submitForm==null) { _submitForm = "index.html"; }
+		$.mobile.changePage(_submitForm, { 
+				changeHash : false, 
+				ajax : false
+			});
+	});
+});
+
+
+function registerUser() {
+	console.log("register");
+	$.ajax({
+		url: urlHost + "php/regUser.php",
+		type: "POST",
+		dataType: "json",
+		data: {
+			username: function() {
+				return $("#tbxName").val();
+			},
+			password: function() {
+				return $("#tbxPwd").val();
+			},
+			email: function() {
+				return $("#tbxEmail").val();
+			}
+		},
+		success: function(result, status) {
+			//alert("res:"+JSON.stringify(result)+"\nstatus:"+JSON.stringify(status));
+			//alert("result:"+(result == true));
+			if((result==true)) {
+				//alertMsg("register success", "index.html");
+				
+			} 
+		},
+		error: function (xhr, status, error) {
+			console.log("ERROR - xhr.status: " + xhr.status + '\nxhr.responseText: ' + xhr.responseText + '\nxhr.statusText: ' + xhr.statusText + '\nError: ' + error + '\nStatus: ' + status);
+		}
+	});
+}
+
+
+function alertMsg(sMsg,sChangePage) {
+	$("#dialogText").html(sMsg);
+	//$("#closeDialog").attr("href",sChangePage);
+	_submitForm = sChangePage;
+	$.mobile.changePage("#alertDialog");
+	//$("#alertDialog").popup( "open" );
+}
+
+/*	$.validator.addMethod("validateUserEmail", function(value, element)
+{
+    var inputElem = $('#regForm :input[name="uemail"]'),
+        data = { "email" : inputElem.val() },
+        eReport = ''; //error report
+
+	var _URL = "php/validateEmail.php";
+    $.ajax(
+    {
+        type: "GET",
+        url: _URL,
+        dataType: "json",
+        data: data,
+        success: function(data)
+        {
+            if (data !== 'true')
+            {
+              return 'This email address is already registered.';
+            }
+            else
+            {
+               return true;
+            }
+        },
+        error: function(xhr, textStatus, errorThrown)
+        {
+            alert('ajax loading error... ... '+url + query);
+            return false;
+        }
+    });
+
+}, '');
+
+$(':input[name="uemail"]').rules("add", { "validateUserEmail" : true} );
+});*/
+/*
+$(document).ready(function () {
+	$("input").blur(function() {
+		//alert($(this)[0].id);
+		//alert("here");
+		var sVal = $(this).val();
+		//alert($(this)[0].id+"\nval:"+sVal);
+		var sMsg = "";
+		$("#lblMsg").text("");
+		switch($(this)[0].id) {
+			case "tbxName":
+				if(sVal.trim()==="") {
+					sMsg = "Username is required";
+				} else {
+					sMsg = checkDuplicateName(sVal);
+				}				
+				break;
+			case "tbxPwd":
+				if(sVal.trim()==="") {
+					sMsg = "Password is required";
+				}
+				break;
+			case "tbxVer":
+				if(sVal.trim()==="") {
+					sMsg = "Verify password is required";
+				} else if(sVal != $("#upwd").val()) {
+					sMsg = "Verify password should the same";
+				}
+				break;
+			case "tbxEmail":
+				if(sVal.trim()==="") {
+					sMsg = "Email is required";
+				} else {
+					if(!validEmail(sVal.trim())) {
+						sMsg = "Invalid Email";
+					}
+				}
+				break;		
+		}
+		if(sMsg!="") { $("#lblMsg").text(sMsg); } 
+		//validateForm();
+	});
+	
+	function validEmail(sEmail) {
+		var rxPatt = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+		//alert(sEmail + "\n" + rxPatt.test(sEmail));
+		return rxPatt.test(sEmail)
+	}
+	
+	function checkDuplicateLogin(sLogin) {
+		var sAction = "select";
+		var sTable = "memLogin";
+		var joParam = { "memLogin" : sLogin };
+	
+		var _URL = "php/funcDBi.php";
+		var _method = "GET";
+		var _dataType = "json";
+		//var _data = { "act" : sAction, "tbl" : sTable, "Param" : joParam };
+		var _sql = "select login from memLogin where login ='" + sLogin + "'";
+		var _data = { "sql" : _sql };
+		
+		//alert(JSON.stringify(_data));
+		$.ajax({
+			url: _URL,
+			type: _method,
+			data: _data,
+			dataType: _dataType,
+			success: function(objJSON) {
+				if(objJSON.length > 0) {
+					$("#lblMsg").text("Username already exists");
+				}
+			}
+		});
+		
+	} 
+	
+	$("#btnRegister").click(function() {
+		if($("#lblMsg").text().length > 0) {
+			alert("Fail to proceed");
+			return;
+		}
+	
+		var sUName = $("#tbxName").val();
+		var sUPwd = $("#tbxPwd").val();
+		var sEmail = $("#tbxEmail").val();
+		
+		var _URL = "php/funcDBi.php";
+		var _method = "POST";
+		var _dataType = "json";
+		//var _sql = "insert into memb (name,password) values(" + sUserName + "," + sPassword + ")";
+		//var _sql = "insert into memb (name,contact) values('" + sUserName + "','" + sPassword + "')";
+		var _sql = "insert into memLogin (login,password,email) values('" + sUName + "','" + sUPwd + "','" +  "')";
+		var _data = { "sql" : _sql };
+		
+		//alert(JSON.stringify(_data));
+		$.ajax({
+			url: _URL,
+			type: _method,
+			data: _data,
+			dataType: _dataType,
+			success: function(objJSON) {
+				//alert(JSON.stringify(objJSON));
+				if(JSON.stringify(objJSON) == "true"){
+					alert("success");
+					$(location).attr("href","home.html");
+				} else {
+					$("#lblMsg").text("Fail to register");
+					//alert("false");
+				}
+				//$("#lblMsg").text(JSON.stringify(objJSON));
+				//alert(objJSON.length);
+				//if(objJSON.length > 0) {
+				//	$("#lblMsg").text("Username already exists");
+				//}
+			}
+		});
+	});
+	
+	function IsJsonString(str) {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+	
+});*/
+</script>
+</head>
+<body>
+<div data-role="page">
+	<div data-role="header">
+		<h1>Register</h1>
+		<a href="index.html" data-icon="arrow-l" data-iconpos="notext" data-transition="slide">Back</a>
+	</div><!-- /header -->
+	<div data-role="main" class="ui-content">
+	<form id="regForm">
+	<fieldset data-role="fieldcontain">
+		<label for="uname">Login Name:</label>
+		<input class="required" type="text" name="uname" id="tbxName" value="" data-clear-btn="true" data-mini="true" placeholder="Enter Username" autofocus>
+	</fieldset>
+	<fieldset data-role="fieldcontain">
+		<label for="upwd">Password:</label>
+		<input class="required" type="password" name="upwd" id="tbxPwd" value="" data-clear-btn="true" autocomplete="off" data-mini="true" placeholder="Enter Password">
+	</fieldset>
+	<fieldset data-role="fieldcontain">
+		<label for="vpwd">Re-Type Password:</label>
+		<input class="required" type="password" name="vpwd" id="tbxVer" value="" data-clear-btn="true" autocomplete="off" data-mini="true" placeholder="Re-Type Password">	
+	</fieldset>
+	<fieldset data-role="fieldcontain">
+		<label for="vpwd">Email:</label>
+		<input class="required" type="email" name="uemail" id="tbxEmail" value="" data-clear-btn="true" autocomplete="off" data-mini="true" placeholder="Email">	
+	</fieldset>	
+	<div class="ui-grid-a">
+		<!--<div class="ui-block-a"></div>
+		<div class="ui-block-b"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">Register</a></div>-->
+		<input type="submit" value="Register">
+		<!--<button id="btnRegister">Register</button>
+		<label id="lblMsg" style="color:red;"></label>-->
+	</div>
+	</form>
+	</div><!-- /content -->
+	<!--<div data-role="footer">
+		<h1>Footer Text</h1>
+	</div>--><!-- /footer -->
+</div>
+<div data-role="page" id="success" data-theme="b">
+    <div data-role="header">
+        <h2>Thank You !!!</h2>
+    </div>
+</div>
+<div data-role="dialog" id="alertDialog" data-rel="popup">
+	<div data-role="header" class="ui-header ui-bar">
+		<h2>message</h2>
+   </div>
+	<div role="main" class="ui-content">
+		<h1 id="dialogText"></h1>
+	</div>
+   <a href="#" id="closeDialog" class="ui-btn">Ok</a>
+</div>
+</body>
+</html>

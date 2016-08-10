@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css\common.css">
+<link rel="stylesheet" href="css\jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="css\themes\information.min.css" />
+<link rel="stylesheet" href="css\themes\jquery.mobile.icons.min.css" />
+<script type='text/javascript' src="js\jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="js\jquery.validate.min.js"></script>
+<script type='text/javascript' src="js\jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="js\myApp.js"></script>
+<style>
+.error {
+    color:red;
+	 font-size: 8pt;
+}
+myPic		{
+	border:1px solid #FF0000;
+	margin-left:auto; margin-right:auto;
+	display:block;
+	width:50%;
+}
+</style>
+
+<script>
+
+$(document).on( "pageinit", function () {
+	checkLogin();
+	
+	$('#formLogin').validate({
+		 rules: {
+			  uname: {
+					required: true
+			  },
+			  upass: {
+					required: true
+			  }
+		 },
+		 messages: {
+			  uname: {
+					required: "Username required"
+			  },
+			  upass: {
+					required: "Password required"
+			  }
+		 },
+		 errorPlacement: function (error, element) {
+			  //error.appendTo(element.parent().prev());
+			  error.insertAfter(element.parent().last());
+		 },
+		 submitHandler: function (form) {
+			  /*$(':mobile-pagecontainer').pagecontainer('change', '#success', {
+					reload: false
+			  });*/			  
+			  loginUser($("#uname").val(), $("#upass").val());
+			  return false;
+		 }
+	});
+
+	$("#btnUser").click(function() {
+	//alert("click logout\n"+$("#btnUser").attr("href"));
+		var _loginUser = localStorage.getItem("loginUser");
+		if(_loginUser && _loginUser != "") {
+			localStorage.setItem("loginUser","");
+			$("#dialogText").html("Logout "+_loginUser);
+			$.mobile.changePage("#alertDialog");
+			checkLogin();
+		}
+	});
+});
+
+function loginUser(sUser,sPass) {
+	console.log("loginUser:"+sUser+"\npass:"+sPass+"\nurlHost:"+urlHost);
+	var _data = { "username" : sUser, "password" : sPass };
+	console.log("data:"+JSON.stringify(_data));
+	$.ajax({
+		url: urlHost + "php/validLogin.php", 
+		data: _data, 
+		type: "GET",
+		dataType: "json",
+		success: function(result, status) {
+			console.log("result:"+JSON.stringify(result)+"\ncompare:"+(result=="true"));
+			if((result=="true")) {
+				console.log("success");
+				localStorage.setItem("loginUser", sUser);
+				$("#uname").val("");
+				$("#upass").val("");
+				$("#dialogText").html("Login success");
+				$.mobile.changePage("#alertDialog");
+			} else {
+				$("#dialogText").html("Invalid Login or Password");
+				$.mobile.changePage("#alertDialog");
+			}
+		},
+		error: function (xhr, status, error) {
+			console.log("ERROR - xhr.status: " + xhr.status + '\nxhr.responseText: ' + xhr.responseText + '\nxhr.statusText: ' + xhr.statusText + '\nError: ' + error + '\nStatus: ' + status);
+		}		
+	});
+}
+
+</script>
+</head>
+<body>
+<div data-role="page">
+	<div id="divGuestHdr" data-role="header" data-position="fixed">
+	  <h1>Home</h1>
+	  <a href="#menuPanel" data-icon="bars" data-iconpos="notext" data-ajax="false">MenuPanel</a>
+	  <a href="#loginPanel" data-icon="user" data-iconpos="notext" data-ajax="false"></a>
+	</div><!-- /header -->
+	<div id="divMemHdr" data-role="header" data-position="fixed">
+	  <h1>Home</h1>
+	  <a href="#menuPanel" data-icon="bars" data-iconpos="notext" data-ajax="false">MenuPanel</a>
+	  <a id="btnUser" href="#" data-icon="user" data-ajax="false">Logout</a>
+	</div><!-- /header -->
+
+	<div data-role="main" class="ui-content">
+		<div>
+			<img id="imgMain" src="pic/PDP_header.PNG" class="myPic">
+			<ul data-role="listview">
+			<li><a href="individual.html" data-ajax="false">For Individuals</a></li>
+			<li><a href="organization.html" data-ajax="false">For Organizations</a></li>
+			<li><a href="law.html" data-ajax="false">Personal Data (Privacy) Law (HK)</a></li>
+			</ul>
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="panel" data-position-fixed="true" data-display="push" data-theme="a" id="menuPanel">
+		<ul data-role="listview">
+			<li data-icon="home"><a href="#" data-rel="close" data-ajax="false">Home</a></li>
+			<li><a href="individual.html" data-ajax="false">Individuals</a></li>
+			<li><a href="organization.html" data-ajax="false">Organizations</a></li>
+			<li><a href="law.html" data-ajax="false">PDP Law (HK)</a></li>
+			<li><a href="videoClips.html" data-ajax="false">Video Clips</a></li>
+			<li><a href="#about" data-ajax="false">Privacy Commissioner, HK</a></li>
+			<li><a href="discuss.html" data-ajax="false">Discuss</a></li>
+		</ul>
+	</div>
+	<div data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" data-theme="a" id="loginPanel">
+		<form id="formLogin">
+		<h2>Login</h2>
+		<label for="uname">Login Name:</label>
+		<input type="text" name="uname" id="uname" value="" data-clear-btn="true" data-mini="true" placeholder="Enter Username">		
+		<label for="upass">Password:</label>
+		<input type="password" name="upass" id="upass" value="" data-clear-btn="true" autocomplete="off" data-mini="true" placeholder="Enter Password">
+		
+		<div class="ui-grid-a">
+			<!--<a href="#" data-rel="" class="ui-btn ui-shadow ui-corner-all ui-btn-a">Login</a>-->
+			<input type="submit" value="Login"></input>
+			<br>
+			<div class="ui-block-a">
+				<a href="register.html" data-rel="close" data-ajax="false" class="ui-btn ui-shadow ui-corner-all ui-btn ui-mini" data-transition="slide">Register</a>
+			</div>
+			<!--<div class="ui-block-b"><a href="" class="ui-mini">Forget Password?</a></div>-->
+		</div>
+		</form>
+	</div>
+	<!--<div data-role="footer" data-position="fixed">
+	 <h1>Footer Text</h1>
+	</div><!-- /footer -->
+</div>
+<div data-role="dialog" id="alertDialog" data-rel="popup">
+	<div data-role="header">
+		<h2>Login</h2>
+   </div>
+	<div role="main" class="ui-content">
+		<h3 id="dialogText"></h3>
+	</div>
+   <a href="#" id="closeDialog" class="ui-btn" data-rel="back">Ok</a>
+</div>
+
+<div id="about" data-role="page">
+	<div data-role="header">
+		<h2>HK Privacy Commissioner</h2>
+		<a href="#" data-rel="back" data-ajax="false" data-icon="arrow-l" data-iconpos="notext">back</a>
+   </div>
+	<div data-role="main" class="ui-content">
+		<h4>Office of the Privacy Commissioner for Personal Data, Hong Kong</h4>
+		<p>Address: 12/F, 248 Queen's Road East, Wanchai, Hong Kong</p>
+		<iframe src="mapLoc01.html" width=100% height=300px frameborder=0 seamless></iframe>
+
+	</div>
+</div>
+
+</body>
+</html>
